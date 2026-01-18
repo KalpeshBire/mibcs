@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Play
 } from 'lucide-react';
+import FeaturedEvents from '../components/Events/FeaturedEvents';
 
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -476,7 +477,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Code Preview Section */}
+            {/* Code Preview Section */}
       <section className="py-20 bg-gray-900/30">
         <div className="container-max">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -532,6 +533,11 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Events Section */}
+      <FeaturedEvents />
+
+
 
       {/* CTA Section */}
       <section className="py-20">

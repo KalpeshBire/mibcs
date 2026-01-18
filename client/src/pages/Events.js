@@ -27,56 +27,7 @@ const Events = () => {
     }
   );
 
-  // Mock events for demo
-  const mockEvents = [
-    {
-      _id: '1',
-      title: 'AI Workshop: Building Neural Networks',
-      description: 'Learn to build and train neural networks from scratch using TensorFlow and PyTorch.',
-      date: '2024-02-15',
-      time: '14:00',
-      location: 'Tech Lab A',
-      type: 'workshop',
-      domain: 'Machine Learning',
-      capacity: 50,
-      registered: 35,
-      status: 'upcoming',
-      speaker: 'Dr. Sarah Chen',
-      registrationUrl: 'https://forms.google.com/ai-workshop'
-    },
-    {
-      _id: '2',
-      title: 'Blockchain Hackathon 2024',
-      description: '48-hour hackathon focused on building decentralized applications and smart contracts.',
-      date: '2024-02-20',
-      time: '09:00',
-      location: 'Innovation Hub',
-      type: 'hackathon',
-      domain: 'Blockchain',
-      capacity: 100,
-      registered: 87,
-      status: 'upcoming',
-      speaker: 'Multiple Mentors',
-      registrationUrl: 'https://forms.google.com/blockchain-hack'
-    },
-    {
-      _id: '3',
-      title: 'IoT Security Best Practices',
-      description: 'Comprehensive seminar on securing IoT devices and networks against cyber threats.',
-      date: '2024-02-25',
-      time: '16:00',
-      location: 'Auditorium B',
-      type: 'seminar',
-      domain: 'Cyber Security',
-      capacity: 80,
-      registered: 62,
-      status: 'upcoming',
-      speaker: 'Prof. Michael Rodriguez',
-      registrationUrl: 'https://forms.google.com/iot-security'
-    }
-  ];
-
-  const events = data?.events || mockEvents;
+  const events = data?.events || [];
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(filters.search.toLowerCase()) ||
                          event.description.toLowerCase().includes(filters.search.toLowerCase());
@@ -99,6 +50,21 @@ const Events = () => {
       'networking': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
     };
     return colors[type] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  };
+
+  const handleRegisterClick = async (event) => {
+    if (event.registrationLink) {
+      try {
+        // Track the registration click
+        await api.post(`/events/${event._id}/register-click`);
+        // Open registration link
+        window.open(event.registrationLink, '_blank');
+      } catch (error) {
+        console.error('Failed to track registration click:', error);
+        // Still open the link even if tracking fails
+        window.open(event.registrationLink, '_blank');
+      }
+    }
   };
 
   return (
@@ -321,56 +287,69 @@ const Events = () => {
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <MapPin size={14} />
-                        <span>{event.location}</span>
+                        <span>{event.venue}</span>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Users size={14} />
-                        <span>{event.registered}/{event.capacity} registered</span>
-                      </div>
+                      {event.maxParticipants && (
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <Users size={14} />
+                          <span>{event.currentParticipants || 0}/{event.maxParticipants} registered</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Domain Badge */}
-                    <div className="flex items-center space-x-2">
-                      <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30">
-                        {event.domain}
-                      </span>
-                    </div>
+                    {event.domains && event.domains.length > 0 && (
+                      <div className="flex items-center space-x-2">
+                        {event.domains.slice(0, 2).map(domain => (
+                          <span key={domain} className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30">
+                            {domain}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                    {/* Speaker */}
-                    <div className="text-sm text-gray-400">
-                      <span className="font-medium">Speaker:</span> {event.speaker}
-                    </div>
+                    {/* Organizers */}
+                    {event.organizers && event.organizers.length > 0 && (
+                      <div className="text-sm text-gray-400">
+                        <span className="font-medium">Organizers:</span> {event.organizers.join(', ')}
+                      </div>
+                    )}
 
                     {/* Registration Progress */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Registration</span>
-                        <span className="text-cyan-400">{Math.round((event.registered / event.capacity) * 100)}%</span>
+                    {event.maxParticipants && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Registration</span>
+                          <span className="text-cyan-400">{Math.round(((event.currentParticipants || 0) / event.maxParticipants) * 100)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${((event.currentParticipants || 0) / event.maxParticipants) * 100}%` }}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${(event.registered / event.capacity) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
+                    )}
 
                     {/* Action Button */}
                     <div className="pt-4 border-t border-gray-800">
-                      {event.status === 'upcoming' ? (
-                        <a
-                          href={event.registrationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      {event.status === 'upcoming' && event.registrationLink ? (
+                        <button
+                          onClick={() => handleRegisterClick(event)}
                           className="w-full btn-primary flex items-center justify-center space-x-2"
                         >
                           <ExternalLink size={16} />
                           <span>Register Now</span>
-                        </a>
-                      ) : (
+                        </button>
+                      ) : event.status === 'completed' ? (
                         <button className="w-full btn-secondary flex items-center justify-center space-x-2">
                           <Play size={16} />
                           <span>View Recording</span>
+                        </button>
+                      ) : (
+                        <button className="w-full btn-outline flex items-center justify-center space-x-2" disabled>
+                          <Calendar size={16} />
+                          <span>Registration Closed</span>
                         </button>
                       )}
                     </div>

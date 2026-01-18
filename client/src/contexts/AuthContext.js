@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       localStorage.removeItem('token');
       delete api.defaults.headers.common['Authorization'];
+      setUser(null); // This was missing!
     } finally {
       setLoading(false);
     }

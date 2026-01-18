@@ -30,7 +30,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/admin/login';
+      delete api.defaults.headers.common['Authorization'];
+      // Don't redirect here - let AuthContext handle it
     }
     return Promise.reject(error);
   }
