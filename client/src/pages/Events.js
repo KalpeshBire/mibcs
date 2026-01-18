@@ -256,102 +256,208 @@ const Events = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="card-glow group hover:scale-105 transition-all duration-300"
+                  className="group relative h-full"
                 >
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getEventTypeColor(event.type)}`}>
-                        {event.type}
-                      </span>
-                      <span className="text-xs text-gray-500 code-font">
-                        {new Date(event.date).toLocaleDateString()}
-                      </span>
+                  {/* Terminal Window Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 via-blue-600/30 to-purple-600/30 rounded-2xl blur opacity-50 group-hover:opacity-100 transition duration-500"></div>
+                  
+                  {/* Terminal Window - Fixed Height */}
+                  <div className="relative bg-black/90 backdrop-blur-xl rounded-2xl border border-gray-700 overflow-hidden hover:border-cyan-500/50 transition-all duration-500 will-change-transform group-hover:scale-[1.02] h-full flex flex-col">
+                    
+                    {/* Terminal Header */}
+                    <div className="flex items-center justify-between px-4 py-3 bg-gray-900/95 border-b border-gray-700 flex-shrink-0">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
+                      <div className="text-gray-400 text-xs code-font">event_{event._id.slice(-6)}.sh</div>
+                      <div className="flex items-center space-x-1">
+                        <span className={`px-2 py-1 rounded text-xs font-medium border ${getEventTypeColor(event.type)}`}>
+                          {event.type}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Title & Description */}
-                    <div>
-                      <h3 className="text-xl font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300 mb-2">
-                        {event.title}
-                      </h3>
-                      <p className="text-gray-400 text-sm leading-relaxed">
-                        {event.description}
-                      </p>
-                    </div>
-
-                    {/* Event Details */}
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Clock size={14} />
-                        <span>{event.time}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <MapPin size={14} />
-                        <span>{event.venue}</span>
-                      </div>
-                      {event.maxParticipants && (
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <Users size={14} />
-                          <span>{event.currentParticipants || 0}/{event.maxParticipants} registered</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Domain Badge */}
-                    {event.domains && event.domains.length > 0 && (
-                      <div className="flex items-center space-x-2">
-                        {event.domains.slice(0, 2).map(domain => (
-                          <span key={domain} className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30">
-                            {domain}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Organizers */}
-                    {event.organizers && event.organizers.length > 0 && (
-                      <div className="text-sm text-gray-400">
-                        <span className="font-medium">Organizers:</span> {event.organizers.join(', ')}
-                      </div>
-                    )}
-
-                    {/* Registration Progress */}
-                    {event.maxParticipants && (
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Registration</span>
-                          <span className="text-cyan-400">{Math.round(((event.currentParticipants || 0) / event.maxParticipants) * 100)}%</span>
-                        </div>
-                        <div className="w-full bg-gray-800 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${((event.currentParticipants || 0) / event.maxParticipants) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Action Button */}
-                    <div className="pt-4 border-t border-gray-800">
-                      {event.status === 'upcoming' && event.registrationLink ? (
-                        <button
-                          onClick={() => handleRegisterClick(event)}
-                          className="w-full btn-primary flex items-center justify-center space-x-2"
-                        >
-                          <ExternalLink size={16} />
-                          <span>Register Now</span>
-                        </button>
-                      ) : event.status === 'completed' ? (
-                        <button className="w-full btn-secondary flex items-center justify-center space-x-2">
-                          <Play size={16} />
-                          <span>View Recording</span>
-                        </button>
+                    {/* Event Image with Terminal Overlay - Fixed Height */}
+                    <div className="relative h-48 bg-gray-800 overflow-hidden flex-shrink-0">
+                      {event.images?.[0]?.url ? (
+                        <>
+                          <img
+                            src={event.images[0].url}
+                            alt={event.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20"></div>
+                          
+                          {/* Terminal Command Overlay */}
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <div className="bg-black/70 backdrop-blur-sm rounded px-3 py-2 border border-gray-600">
+                              <div className="text-green-400 code-font text-xs flex items-center">
+                                <span className="text-gray-500">$ </span>
+                                <motion.span
+                                  initial={{ width: 0 }}
+                                  whileInView={{ width: 'auto' }}
+                                  transition={{ duration: 1, delay: index * 0.2 }}
+                                  className="overflow-hidden whitespace-nowrap"
+                                >
+                                  cat {event.title.toLowerCase().replace(/\s+/g, '_')}.md
+                                </motion.span>
+                                <motion.span
+                                  animate={{ opacity: [1, 0, 1] }}
+                                  transition={{ duration: 0.8, repeat: Infinity }}
+                                  className="bg-green-400 w-2 h-3 inline-block ml-1"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
                       ) : (
-                        <button className="w-full btn-outline flex items-center justify-center space-x-2" disabled>
-                          <Calendar size={16} />
-                          <span>Registration Closed</span>
-                        </button>
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                          <div className="text-center">
+                            <Calendar size={48} className="text-gray-600 mx-auto mb-2" />
+                            <div className="text-gray-500 code-font text-sm">No image available</div>
+                          </div>
+                        </div>
                       )}
+                    </div>
+
+                    {/* Terminal Content - Flexible Height */}
+                    <div className="p-6 code-font flex-1 flex flex-col">
+                      {/* Event Status & Date */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-cyan-400 text-xs">[{event.status.toUpperCase()}]</span>
+                          <span className="text-green-400 text-xs">●</span>
+                          <span className="text-green-400 text-xs">ACTIVE</span>
+                        </div>
+                        <span className="text-gray-400 text-xs">
+                          {new Date(event.date).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      {/* Title with Terminal Styling */}
+                      <div className="mb-4">
+                        <div className="text-gray-500 text-xs mb-1"># Event Title:</div>
+                        <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors duration-300 line-clamp-2 min-h-[3.5rem]">
+                          {event.title}
+                        </h3>
+                      </div>
+
+                      {/* Description */}
+                      <div className="mb-4 flex-1">
+                        <div className="text-gray-500 text-xs mb-1"># Description:</div>
+                        <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
+                          {event.shortDescription || event.description}
+                        </p>
+                      </div>
+
+                      {/* Event Details in Terminal Style */}
+                      <div className="space-y-2 mb-4 bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                        <div className="flex items-center text-xs">
+                          <Clock size={12} className="mr-2 text-cyan-400" />
+                          <span className="text-gray-400">Time:</span>
+                          <span className="text-white ml-2">{event.time}</span>
+                        </div>
+                        <div className="flex items-center text-xs">
+                          <MapPin size={12} className="mr-2 text-cyan-400" />
+                          <span className="text-gray-400">Venue:</span>
+                          <span className="text-white ml-2 truncate">{event.venue}</span>
+                        </div>
+                        {event.maxParticipants && (
+                          <div className="flex items-center text-xs">
+                            <Users size={12} className="mr-2 text-cyan-400" />
+                            <span className="text-gray-400">Capacity:</span>
+                            <span className="text-white ml-2">
+                              {event.currentParticipants || 0}/{event.maxParticipants}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Domain Tags */}
+                      {event.domains && event.domains.length > 0 && (
+                        <div className="mb-4">
+                          <div className="text-gray-500 text-xs mb-2"># Domains:</div>
+                          <div className="flex flex-wrap gap-2">
+                            {event.domains.slice(0, 2).map(domain => (
+                              <span key={domain} className="px-2 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded border border-cyan-500/30">
+                                {domain}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Organizers */}
+                      {event.organizers && event.organizers.length > 0 && (
+                        <div className="mb-4">
+                          <div className="text-gray-500 text-xs mb-1"># Organizers:</div>
+                          <div className="text-gray-300 text-xs">
+                            {event.organizers.join(', ')}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Registration Progress Bar */}
+                      {event.maxParticipants && (
+                        <div className="mb-4">
+                          <div className="flex justify-between text-xs mb-2">
+                            <span className="text-gray-400">Registration Progress</span>
+                            <span className="text-cyan-400">
+                              {Math.round(((event.currentParticipants || 0) / event.maxParticipants) * 100)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-700">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              whileInView={{ width: `${((event.currentParticipants || 0) / event.maxParticipants) * 100}%` }}
+                              transition={{ duration: 1, delay: index * 0.2 }}
+                              className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full relative overflow-hidden"
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                            </motion.div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Terminal Command Button - Fixed at Bottom */}
+                      <div className="mt-auto">
+                        {event.status === 'upcoming' && event.registrationLink ? (
+                          <motion.button
+                            onClick={() => handleRegisterClick(event)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border border-cyan-500 rounded-lg p-3 text-cyan-400 hover:bg-cyan-500/30 transition-all duration-300 group/btn relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+                            <div className="relative flex items-center justify-center space-x-2">
+                              <ExternalLink size={14} />
+                              <span className="font-medium">./register_now.sh</span>
+                              <motion.div
+                                animate={{ x: [0, 3, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                              >
+                                <Play size={14} />
+                              </motion.div>
+                            </div>
+                          </motion.button>
+                        ) : event.status === 'completed' ? (
+                          <button className="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-gray-400 hover:text-white hover:border-gray-500 transition-all duration-300">
+                            <div className="flex items-center justify-center space-x-2">
+                              <Play size={14} />
+                              <span>cat recording.mp4</span>
+                            </div>
+                          </button>
+                        ) : (
+                          <button className="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-gray-500 cursor-not-allowed" disabled>
+                            <div className="flex items-center justify-center space-x-2">
+                              <Calendar size={14} />
+                              <span>registration_closed</span>
+                            </div>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
