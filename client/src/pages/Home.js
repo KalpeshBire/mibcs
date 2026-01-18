@@ -36,12 +36,12 @@ const Home = () => {
   useEffect(() => {
     const generateBinaryMatrix = () => {
       const matrix = [];
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 25; i++) {
         matrix.push({
           id: i,
           x: Math.random() * 100,
           delay: Math.random() * 5,
-          speed: Math.random() * 3 + 1,
+          speed: Math.random() * 2 + 2,
           binary: Array.from({ length: 20 }, () => Math.random() > 0.5 ? '1' : '0').join('')
         });
       }
@@ -67,20 +67,32 @@ const Home = () => {
             setCurrentCommand((prev) => (prev + 1) % terminalCommands.length);
           }, 2000);
         }
-      }, 100);
+      }, 80);
     };
 
     const timer = setTimeout(typeCommand, 1000);
     return () => clearTimeout(timer);
   }, [currentCommand, terminalCommands]);
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+ useEffect(() => {
+  let ticking = false;
+
+  const handleMouseMove = (e) => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
+  window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+  return () => {
+    window.removeEventListener('mousemove', handleMouseMove);
+  };
+}, []);
 
   const stats = [
     { number: '500+', label: 'Members', Icon: Users, delay: 0 },
@@ -103,13 +115,12 @@ const Home = () => {
     <div className="bg-gray-950 overflow-hidden" style={{ paddingTop: 0 }}>
       {/* Animated cursor follower */}
       <div 
-        className="fixed w-6 h-6 bg-cyan-400/30 rounded-full pointer-events-none z-50 mix-blend-screen"
-        style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
-          transition: 'all 0.1s ease-out'
-        }}
-      />
+  className="fixed w-6 h-6 bg-cyan-400/30 rounded-full pointer-events-none z-50 mix-blend-screen"
+  style={{
+    transform: `translate3d(${mousePosition.x - 12}px, ${mousePosition.y - 12}px, 0)`
+  }}
+/>
+
 
       {/* Hero Section - Terminal Theme */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden p-4">
@@ -218,7 +229,7 @@ const Home = () => {
             </div>
 
             {/* Terminal Content */}
-            <div className="terminal-content flex-1 p-4 md:p-6 code-font overflow-y-auto terminal-content-scroll">
+            <div className="terminal-content flex-1 p-4 md:p-6 code-font">
               {/* Welcome Message */}
               <motion.div
                 initial={{ opacity: 0 }}
