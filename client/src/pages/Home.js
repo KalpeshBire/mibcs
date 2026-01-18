@@ -36,7 +36,7 @@ const Home = () => {
   useEffect(() => {
     const generateBinaryMatrix = () => {
       const matrix = [];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 15; i++) {
         matrix.push({
           id: i,
           x: Math.random() * 100,
