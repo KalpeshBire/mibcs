@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from 'react-query';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, MapPin, Users, ExternalLink, Star, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ExternalLink, Star, ArrowRight, Terminal, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { api } from '../../utils/api';
@@ -52,10 +52,39 @@ const FeaturedEvents = () => {
 
   return (
     <section className="py-20 bg-gray-900/30 relative overflow-hidden">
-      {/* Background Effects */}
+      {/* Terminal Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-gray-900/50"></div>
-        <div className="matrix-bg opacity-5"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"></div>
+        <div className="terminal-grid-pattern w-full h-full opacity-5"></div>
+        
+        {/* Floating Code Snippets */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[
+            { text: 'npm run event', x: '10%', y: '20%', delay: 0 },
+            { text: 'git commit -m "join event"', x: '85%', y: '30%', delay: 2 },
+            { text: './register.sh --event=featured', x: '15%', y: '70%', delay: 4 },
+          ].map((cmd, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ 
+                opacity: [0, 0.3, 0],
+                scale: [0, 1, 0],
+                y: [0, -20, -40]
+              }}
+              transition={{
+                duration: 8,
+                delay: cmd.delay,
+                repeat: Infinity,
+                repeatDelay: 15
+              }}
+              className="absolute code-font text-xs text-cyan-400/20 hidden lg:block"
+              style={{ left: cmd.x, top: cmd.y }}
+            >
+              $ {cmd.text}
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       <div className="container-max relative z-10">
@@ -79,7 +108,7 @@ const FeaturedEvents = () => {
           </p>
         </motion.div>
 
-        {/* Events Grid */}
+        {/* Terminal-Style Events Grid with Fixed Heights */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {featuredEvents.map((event, index) => {
             const eventType = EVENT_TYPES.find(type => type.id === event.type);
@@ -93,108 +122,179 @@ const FeaturedEvents = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group relative"
+                className="group relative h-full"
               >
-                {/* Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
+                {/* Terminal Window Glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 via-blue-600/30 to-purple-600/30 rounded-2xl blur opacity-50 group-hover:opacity-100 transition duration-500"></div>
                 
-                <div className="relative bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-700/50 overflow-hidden hover:border-cyan-500/50 transition-all duration-300">
-                  {/* Featured Badge */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold flex items-center">
-                      <Star size={12} className="mr-1" />
-                      FEATURED
+                {/* Terminal Window - Fixed Height */}
+                <div className="relative bg-black/90 backdrop-blur-xl rounded-2xl border border-gray-700 overflow-hidden hover:border-cyan-500/50 transition-all duration-500 will-change-transform group-hover:scale-[1.02] h-full flex flex-col">
+                  
+                  {/* Terminal Header */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-gray-900/95 border-b border-gray-700 flex-shrink-0">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                    <div className="text-gray-400 text-xs code-font">event_{event._id.slice(-6)}.sh</div>
+                    <div className="flex items-center space-x-1">
+                      <Star size={12} className="text-yellow-400" />
+                      <span className="text-xs text-yellow-400 code-font">FEATURED</span>
                     </div>
                   </div>
 
-                  {/* Event Image */}
-                  {event.images?.[0]?.url && (
-                    <div className="relative h-48 bg-gray-800">
-                      <img
-                        src={event.images[0].url}
-                        alt={event.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                    </div>
-                  )}
+                  {/* Event Image with Terminal Overlay - Fixed Height */}
+                  <div className="relative h-48 bg-gray-800 overflow-hidden flex-shrink-0">
+                    {event.images?.[0]?.url ? (
+                      <>
+                        <img
+                          src={event.images[0].url}
+                          alt={event.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20"></div>
+                        
+                        {/* Terminal Command Overlay */}
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <div className="bg-black/70 backdrop-blur-sm rounded px-3 py-2 border border-gray-600">
+                            <div className="text-green-400 code-font text-xs flex items-center">
+                              <span className="text-gray-500">$ </span>
+                              <motion.span
+                                initial={{ width: 0 }}
+                                whileInView={{ width: 'auto' }}
+                                transition={{ duration: 1, delay: index * 0.2 }}
+                                className="overflow-hidden whitespace-nowrap"
+                              >
+                                cat {event.title.toLowerCase().replace(/\s+/g, '_')}.md
+                              </motion.span>
+                              <motion.span
+                                animate={{ opacity: [1, 0, 1] }}
+                                transition={{ duration: 0.8, repeat: Infinity }}
+                                className="bg-green-400 w-2 h-3 inline-block ml-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                        <div className="text-center">
+                          <Terminal size={48} className="text-gray-600 mx-auto mb-2" />
+                          <div className="text-gray-500 code-font text-sm">No image available</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="p-6">
-                    {/* Event Type & Date */}
+                  {/* Terminal Content - Flexible Height */}
+                  <div className="p-6 code-font flex-1 flex flex-col">
+                    {/* Event Type & Status */}
                     <div className="flex items-center justify-between mb-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${eventType?.color || 'bg-gray-100 text-gray-800'}`}>
-                        {eventType?.name || event.type}
-                      </span>
-                      <span className="text-xs text-gray-400 code-font">
-                        {format(eventDate, 'MMM dd, yyyy')}
+                      <div className="flex items-center space-x-2">
+                        <span className="text-cyan-400 text-xs">[{eventType?.name || event.type}]</span>
+                        <span className="text-green-400 text-xs">●</span>
+                        <span className="text-green-400 text-xs">ACTIVE</span>
+                      </div>
+                      <span className="text-gray-400 text-xs">
+                        {format(eventDate, 'MMM dd')}
                       </span>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-2">
-                      {event.title}
-                    </h3>
+                    {/* Title with Terminal Styling */}
+                    <div className="mb-4">
+                      <div className="text-gray-500 text-xs mb-1"># Event Title:</div>
+                      <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors duration-300 line-clamp-2 min-h-[3.5rem]">
+                        {event.title}
+                      </h3>
+                    </div>
 
                     {/* Description */}
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-                      {event.shortDescription || event.description}
-                    </p>
+                    <div className="mb-4 flex-1">
+                      <div className="text-gray-500 text-xs mb-1"># Description:</div>
+                      <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
+                        {event.shortDescription || event.description}
+                      </p>
+                    </div>
 
-                    {/* Event Details */}
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock size={14} className="mr-2 text-gray-400" />
-                        <span>{event.time}</span>
+                    {/* Event Details in Terminal Style */}
+                    <div className="space-y-2 mb-4 bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                      <div className="flex items-center text-xs">
+                        <Clock size={12} className="mr-2 text-cyan-400" />
+                        <span className="text-gray-400">Time:</span>
+                        <span className="text-white ml-2">{event.time}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin size={14} className="mr-2 text-gray-400" />
-                        <span className="truncate">{event.venue}</span>
+                      <div className="flex items-center text-xs">
+                        <MapPin size={12} className="mr-2 text-cyan-400" />
+                        <span className="text-gray-400">Venue:</span>
+                        <span className="text-white ml-2 truncate">{event.venue}</span>
                       </div>
                       {event.maxParticipants && (
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users size={14} className="mr-2 text-gray-400" />
-                          <span>{event.currentParticipants || 0} / {event.maxParticipants} registered</span>
+                        <div className="flex items-center text-xs">
+                          <Users size={12} className="mr-2 text-cyan-400" />
+                          <span className="text-gray-400">Capacity:</span>
+                          <span className="text-white ml-2">
+                            {event.currentParticipants || 0}/{event.maxParticipants}
+                          </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Registration Progress */}
+                    {/* Registration Progress Bar */}
                     {event.maxParticipants && (
-                      <div className="mb-6">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-gray-400">Registration</span>
+                      <div className="mb-4">
+                        <div className="flex justify-between text-xs mb-2">
+                          <span className="text-gray-400">Registration Progress</span>
                           <span className="text-cyan-400">
                             {Math.round(((event.currentParticipants || 0) / event.maxParticipants) * 100)}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-800 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${((event.currentParticipants || 0) / event.maxParticipants) * 100}%` }}
-                          ></div>
+                        <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-700">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${((event.currentParticipants || 0) / event.maxParticipants) * 100}%` }}
+                            transition={{ duration: 1, delay: index * 0.2 }}
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                          </motion.div>
                         </div>
                       </div>
                     )}
 
-                    {/* Action Button */}
-                    {event.registrationLink && isUpcoming ? (
-                      <button
-                        onClick={() => handleRegisterClick(event)}
-                        className="w-full btn-primary flex items-center justify-center group/btn"
-                      >
-                        <ExternalLink size={16} className="mr-2" />
-                        <span>Register Now</span>
-                        <ArrowRight size={16} className="ml-2 group-hover/btn:translate-x-1 transition-transform duration-200" />
-                      </button>
-                    ) : (
-                      <Link
-                        to={`/events`}
-                        className="w-full btn-outline flex items-center justify-center"
-                      >
-                        <Calendar size={16} className="mr-2" />
-                        <span>View Details</span>
-                      </Link>
-                    )}
+                    {/* Terminal Command Button - Fixed at Bottom */}
+                    <div className="mt-auto">
+                      {event.registrationLink && isUpcoming ? (
+                        <motion.button
+                          onClick={() => handleRegisterClick(event)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border border-cyan-500 rounded-lg p-3 text-cyan-400 hover:bg-cyan-500/30 transition-all duration-300 group/btn relative overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+                          <div className="relative flex items-center justify-center space-x-2">
+                            <Play size={14} />
+                            <span className="font-medium">./register_now.sh</span>
+                            <motion.div
+                              animate={{ x: [0, 3, 0] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            >
+                              <ArrowRight size={14} />
+                            </motion.div>
+                          </div>
+                        </motion.button>
+                      ) : (
+                        <Link
+                          to={`/events`}
+                          className="w-full block bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-gray-400 hover:text-white hover:border-gray-500 transition-all duration-300 text-center"
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            <Terminal size={14} />
+                            <span>cat event_details.md</span>
+                          </div>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
