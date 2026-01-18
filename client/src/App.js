@@ -13,6 +13,7 @@ import Events from './pages/Events';
 import Members from './pages/Members';
 import Sponsors from './pages/Sponsors';
 import Contact from './pages/Contact';
+import Gallery from './pages/Gallery';
 
 // Admin Pages
 import AdminLayout from './components/Admin/AdminLayout';
@@ -24,6 +25,7 @@ import AdminProjects from './pages/Admin/AdminProjects';
 import AdminMembers from './pages/Admin/AdminMembers';
 import AdminSponsors from './pages/Admin/AdminSponsors';
 import AdminContacts from './pages/Admin/AdminContacts';
+import AdminGallery from './pages/Admin/AdminGallery';
 
 // Protected Route Component
 import ProtectedRoute from './components/Admin/ProtectedRoute';
@@ -44,6 +46,7 @@ function App() {
             <Route path="members" element={<Members />} />
             <Route path="sponsors" element={<Sponsors />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="gallery" element={<Gallery />} />
           </Route>
 
           {/* Admin Routes */}
@@ -60,6 +63,7 @@ function App() {
             <Route path="members" element={<AdminMembers />} />
             <Route path="sponsors" element={<AdminSponsors />} />
             <Route path="contacts" element={<AdminContacts />} />
+            <Route path="gallery" element={<AdminGallery />} />
           </Route>
 
           {/* 404 Route */}

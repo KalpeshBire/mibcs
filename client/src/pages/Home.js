@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Code, 
+import {
+  ArrowRight,
+  Code,
   Trophy,
   Calendar,
   Users,
@@ -13,6 +13,15 @@ import {
   Play
 } from 'lucide-react';
 import FeaturedEvents from '../components/Events/FeaturedEvents';
+import FeaturedAchievements from '../components/Achievements/FeaturedAchievements';
+import FeaturedProjects from '../components/Projects/FeaturedProjects';
+import GallerySection from '../components/Home/GallerySection';
+
+// ... (rest of imports)
+
+// ... (inside Home component return)
+
+
 
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -56,7 +65,7 @@ const Home = () => {
       const command = terminalCommands[currentCommand];
       let index = 0;
       setTerminalText('');
-      
+
       const typing = setInterval(() => {
         if (index < command.length) {
           setTerminalText(command.substring(0, index + 1));
@@ -128,7 +137,7 @@ const Home = () => {
         <div className="absolute inset-0">
           {/* Base terminal background */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-black to-gray-900"></div>
-          
+
           {/* Binary Matrix Rain */}
           <div className="absolute inset-0 overflow-hidden opacity-15">
             {binaryMatrix.map((column) => (
@@ -137,9 +146,9 @@ const Home = () => {
                 className="absolute top-0 text-cyan-400 code-font text-xs leading-tight"
                 style={{ left: `${column.x}%` }}
                 initial={{ y: -100, opacity: 0 }}
-                animate={{ 
-                  y: '100vh', 
-                  opacity: [0, 1, 1, 0] 
+                animate={{
+                  y: '100vh',
+                  opacity: [0, 1, 1, 0]
                 }}
                 transition={{
                   duration: column.speed * 3,
@@ -151,14 +160,14 @@ const Home = () => {
                 {column.binary.split('').map((bit, index) => (
                   <motion.div
                     key={index}
-                    animate={{ 
+                    animate={{
                       opacity: [0.3, 1, 0.3],
                       color: Math.random() > 0.95 ? '#ffffff' : '#06b6d4'
                     }}
-                    transition={{ 
-                      duration: 0.5, 
+                    transition={{
+                      duration: 0.5,
                       delay: index * 0.1,
-                      repeat: Infinity 
+                      repeat: Infinity
                     }}
                   >
                     {bit}
@@ -173,7 +182,7 @@ const Home = () => {
             <svg className="w-full h-full">
               <defs>
                 <pattern id="terminal-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#06b6d4" strokeWidth="1"/>
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#06b6d4" strokeWidth="1" />
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#terminal-grid)" />
@@ -295,7 +304,7 @@ const Home = () => {
               >
                 <div className="text-cyan-400 text-xs leading-tight">
                   <pre className="inline-block ascii-art">
-{`███╗   ███╗██╗██████╗  ██████╗███████╗
+                    {`███╗   ███╗██╗██████╗  ██████╗███████╗
 ████╗ ████║██║██╔══██╗██╔════╝██╔════╝
 ██╔████╔██║██║██████╔╝██║     ███████╗
 ██║╚██╔╝██║██║██╔══██╗██║     ╚════██║
@@ -355,8 +364,8 @@ const Home = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Link 
-                    to="/contact" 
+                  <Link
+                    to="/contact"
                     className="terminal-btn group relative inline-flex items-center space-x-2 px-6 py-2 bg-cyan-500/20 border border-cyan-500 rounded text-cyan-400 hover:bg-cyan-500/30 transition-all duration-300"
                   >
                     <Terminal size={16} />
@@ -374,8 +383,8 @@ const Home = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Link 
-                    to="/projects" 
+                  <Link
+                    to="/projects"
                     className="terminal-btn group inline-flex items-center space-x-2 px-6 py-2 border border-gray-600 rounded text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-all duration-300"
                   >
                     <Code size={16} />
@@ -434,7 +443,7 @@ const Home = () => {
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0 }}
-                animate={{ 
+                animate={{
                   opacity: [0, 0.3, 0],
                   scale: [0, 1, 0],
                   y: [0, -15, -30]
@@ -488,7 +497,7 @@ const Home = () => {
         </div>
       </section>
 
-            {/* Code Preview Section */}
+      {/* Code Preview Section */}
       <section className="py-20 bg-gray-900/30">
         <div className="container-max">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -502,7 +511,7 @@ const Home = () => {
                 Code the <span className="text-gradient">Future</span>
               </h2>
               <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-                Join a community of innovators, builders, and dreamers. From AI algorithms to blockchain protocols, 
+                Join a community of innovators, builders, and dreamers. From AI algorithms to blockchain protocols,
                 we're shaping tomorrow's technology today.
               </p>
               <Link to="/about" className="btn-outline">
@@ -548,7 +557,14 @@ const Home = () => {
       {/* Featured Events Section */}
       <FeaturedEvents />
 
+      {/* Featured Projects Section */}
+      <FeaturedProjects />
 
+      {/* Featured Achievements Section */}
+      <FeaturedAchievements />
+
+      {/* Gallery Section */}
+      <GallerySection />
 
       {/* CTA Section */}
       <section className="py-20">
@@ -568,7 +584,7 @@ const Home = () => {
                   Ready to <span className="text-gradient">Build</span> the Future?
                 </h2>
                 <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-                  Join MIBCS and be part of a community that's pushing the boundaries of technology. 
+                  Join MIBCS and be part of a community that's pushing the boundaries of technology.
                   From hackathons to research projects, your journey starts here.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

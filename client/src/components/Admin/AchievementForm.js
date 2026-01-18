@@ -17,8 +17,8 @@ const ACHIEVEMENT_CATEGORIES = [
 
 const AchievementForm = ({ achievement, onClose, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [imagePreview, setImagePreview] = useState(achievement?.images?.[0]?.url || '');
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreviews, setImagePreviews] = useState(achievement?.images?.map(img => img.url) || []);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     const {
         register,
@@ -71,12 +71,15 @@ const AchievementForm = ({ achievement, onClose, onSuccess }) => {
 
             formData.append('featured', data.featured);
 
-            if (selectedFile) {
-                formData.append('image', selectedFile);
+            if (selectedFiles.length > 0) {
+                selectedFiles.forEach(file => {
+                    formData.append('images', file);
+                });
             }
 
             // Do not set Content-Type manually for FormData
             // const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
             let response;
 
             if (achievement) {
@@ -99,16 +102,22 @@ const AchievementForm = ({ achievement, onClose, onSuccess }) => {
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error('Image size should be less than 5MB');
-                return;
-            }
-            setSelectedFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
-            reader.readAsDataURL(file);
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            const newFiles = [];
+            const newPreviews = [];
+
+            files.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    toast.error(`File ${file.name} is too large (>5MB)`);
+                    return;
+                }
+                newFiles.push(file);
+                newPreviews.push(URL.createObjectURL(file));
+            });
+
+            setSelectedFiles(prev => [...prev, ...newFiles]);
+            setImagePreviews(prev => [...prev, ...newPreviews]);
         }
     };
 
@@ -216,19 +225,33 @@ const AchievementForm = ({ achievement, onClose, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2 code-font">Achievement Image</label>
-                        <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 bg-gray-800/30">
-                            {imagePreview ? (
-                                <div className="relative">
-                                    <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
-                                    <button type="button" onClick={() => { setImagePreview(''); setSelectedFile(null); }} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"><X size={16} /></button>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Achievement Images (Max 5)</label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                            {imagePreviews.length > 0 ? (
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {imagePreviews.map((preview, index) => (
+                                        <div key={index} className="relative group">
+                                            <img src={preview} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
+                                            {/* We can add a remove button here later if needed, but for now allow clearing all or adding */}
+                                        </div>
+                                    ))}
+                                    {imagePreviews.length < 5 && (
+                                        <div className="flex items-center justify-center h-32 border-2 border-dashed border-gray-200 rounded-lg">
+                                            <label htmlFor="ach-img-upload-more" className="cursor-pointer text-gray-400 hover:text-cyan-500 flex flex-col items-center">
+                                                <Upload size={24} />
+                                                <span className="text-xs mt-1">Add More</span>
+                                                <input type="file" multiple accept="image/*" onChange={handleImageChange} className="hidden" id="ach-img-upload-more" />
+                                            </label>
+                                        </div>
+                                    )}
+                                    <button type="button" onClick={() => { setImagePreviews([]); setSelectedFiles([]); }} className="absolute -top-3 -right-3 bg-red-500 text-white p-1 rounded-full shadow-md z-10 hover:bg-red-600"><X size={16} /></button>
                                 </div>
                             ) : (
                                 <div className="text-center">
                                     <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-                                    <p className="text-gray-400 mb-2">Upload achievement image</p>
-                                    <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="ach-img-upload" />
-                                    <label htmlFor="ach-img-upload" className="btn-outline cursor-pointer">Choose File</label>
+                                    <p className="text-gray-600 mb-2">Upload images (Select multiple)</p>
+                                    <input type="file" multiple accept="image/*" onChange={handleImageChange} className="hidden" id="ach-img-upload" />
+                                    <label htmlFor="ach-img-upload" className="btn-outline cursor-pointer">Choose Files</label>
                                 </div>
                             )}
                         </div>

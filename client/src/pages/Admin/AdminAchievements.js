@@ -70,6 +70,7 @@ const AdminAchievements = () => {
 
   const handleSuccess = () => {
     queryClient.invalidateQueries('admin-achievements');
+    queryClient.invalidateQueries('featured-achievements'); // Also invalidate public query
   };
 
   const handleView = () => {

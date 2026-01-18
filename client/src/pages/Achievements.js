@@ -131,80 +131,73 @@ const Achievements = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="card-glow group hover:scale-105 transition-all duration-300"
+                  className="group relative h-full flex"
                 >
-                  {achievement.images && achievement.images.length > 0 && (
-                    <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
-                      <img
-                        src={achievement.images[0].url}
-                        alt={achievement.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                    </div>
-                  )}
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
 
-                  <div className="space-y-4">
-                    {/* Category Badge */}
-                    <div className="flex items-center justify-between">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${achievement.category === 'hackathon' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
-                        achievement.category === 'competition' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                          achievement.category === 'research' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                            'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                        }`}>
-                        {achievement.category}
-                      </span>
-                      <span className="text-xs text-gray-500 code-font">
-                        {new Date(achievement.date).getFullYear()}
-                      </span>
+                  <div className="relative w-full bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-700/50 overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col">
+
+                    {/* Image Section */}
+                    <div className="relative h-64 bg-gray-800 shrink-0 overflow-hidden">
+                      {achievement.images && achievement.images.length > 0 ? (
+                        <img
+                          src={achievement.images[0].url}
+                          alt={achievement.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                          <Trophy size={48} className="text-gray-600" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent"></div>
+
+                      {/* Rank/Prize Badge */}
+                      {achievement.prize && (
+                        <div className="absolute top-4 right-4">
+                          <span className="flex items-center space-x-1 px-3 py-1 text-xs font-bold text-white bg-yellow-500/20 border border-yellow-500/30 rounded-full backdrop-blur-md">
+                            <Trophy size={11} className="text-yellow-400" />
+                            <span className="text-yellow-400">{achievement.prize}</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Title & Description */}
-                    <div>
-                      <h3 className="text-xl font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300 mb-2">
+                    <div className="p-6 flex flex-col flex-grow">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2 text-xs text-gray-400">
+                          <Calendar size={12} />
+                          <span>{new Date(achievement.date).getFullYear()}</span>
+                        </div>
+
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${achievement.category === 'hackathon' ? 'bg-purple-500/10 text-purple-400' :
+                          achievement.category === 'competition' ? 'bg-blue-500/10 text-blue-400' :
+                            'bg-green-500/10 text-green-400'
+                          }`}>
+                          {achievement.category}
+                        </span>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1">
                         {achievement.title}
                       </h3>
-                      <p className="text-gray-400 text-sm leading-relaxed">
+
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">
                         {achievement.description}
                       </p>
-                    </div>
 
-                    {/* Domain Badge */}
-                    <div className="flex items-center space-x-2">
-                      <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30">
-                        {achievement.domain}
-                      </span>
-                    </div>
-
-                    {/* Team Members */}
-                    {achievement.team && achievement.team.length > 0 && (
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2 text-sm text-gray-400">
-                          <Users size={14} />
-                          <span>Team Members:</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {achievement.team.map((member, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded">
+                      <div className="pt-4 border-t border-gray-800 mt-auto">
+                        <div className="flex flex-wrap gap-2">
+                          {/* Team Members */}
+                          {achievement.team && achievement.team.map((member, idx) => (
+                            <span key={idx} className="flex items-center text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">
+                              <Users size={10} className="mr-1" />
                               {member}
                             </span>
                           ))}
                         </div>
                       </div>
-                    )}
-
-                    {/* Prize/Recognition */}
-                    {achievement.prize && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <Trophy size={14} className="text-yellow-400" />
-                        <span className="text-yellow-400 font-medium">{achievement.prize}</span>
-                      </div>
-                    )}
-
-                    {/* Date */}
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <Calendar size={14} />
-                      <span>{new Date(achievement.date).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </motion.div>

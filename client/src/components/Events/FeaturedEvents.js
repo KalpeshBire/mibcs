@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, MapPin, Users, ExternalLink, Star, ArrowRight, Terminal, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -9,31 +9,18 @@ import { EVENT_TYPES } from '../../utils/constants';
 import LoadingSpinner from '../UI/LoadingSpinner';
 
 const FeaturedEvents = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const { data, isLoading } = useQuery(
     'featured-events',
-    () => api.get('/events?featured=true&status=upcoming&limit=3').then(res => res.data),
+    () => api.get('/events?featured=true&status=upcoming&limit=10').then(res => res.data),
     {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     }
   );
 
   const featuredEvents = data?.events || [];
-
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-gray-900/30">
-        <div className="container-max">
-          <div className="flex justify-center">
-            <LoadingSpinner size="lg" />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (featuredEvents.length === 0) {
-    return null; // Don't render section if no featured events
-  }
+  const itemsPerPage = 3;
 
   const handleRegisterClick = async (event) => {
     if (event.registrationLink) {
@@ -49,6 +36,44 @@ const FeaturedEvents = () => {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-gray-900/30">
+        <div className="container-max">
+          <div className="flex justify-center">
+            <LoadingSpinner size="lg" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredEvents.length === 0) {
+    return null;
+  }
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % featuredEvents.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
+  };
+
+  // Calculate visible items for carousel effect
+  // This is a simple sliding window or circular buffer logic
+  const getVisibleEvents = () => {
+    if (featuredEvents.length <= itemsPerPage) return featuredEvents;
+
+    const visible = [];
+    for (let i = 0; i < itemsPerPage; i++) {
+      visible.push(featuredEvents[(currentIndex + i) % featuredEvents.length]);
+    }
+    return visible;
+  };
+
+  const visibleEvents = getVisibleEvents();
 
   return (
     <section className="py-20 bg-gray-900/30 relative overflow-hidden">
@@ -89,7 +114,7 @@ const FeaturedEvents = () => {
 
       <div className="container-max relative z-10">
         {/* Section Header */}
-        <motion.div
+<motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -110,12 +135,13 @@ const FeaturedEvents = () => {
 
         {/* Terminal-Style Events Grid with Fixed Heights */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {featuredEvents.map((event, index) => {
-            const eventType = EVENT_TYPES.find(type => type.id === event.type);
-            const eventDate = new Date(event.date);
-            const isUpcoming = eventDate > new Date();
+          <AnimatePresence mode='wait'>
+            {visibleEvents.map((event, index) => {
+              const eventType = EVENT_TYPES.find(type => type.id === event.type);
+              const eventDate = new Date(event.date);
+              const isUpcoming = eventDate > new Date();
 
-            return (
+              return (
               <motion.div
                 key={event._id}
                 initial={{ opacity: 0, y: 30 }}
@@ -300,6 +326,7 @@ const FeaturedEvents = () => {
               </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
 
         {/* View All Events CTA */}

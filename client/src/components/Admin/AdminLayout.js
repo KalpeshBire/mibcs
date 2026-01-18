@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  Trophy, 
-  FolderOpen, 
-  Users, 
-  Heart, 
-  MessageSquare, 
+import {
+  LayoutDashboard,
+  Calendar,
+  Trophy,
+  FolderOpen,
+  Users,
+  Heart,
+  MessageSquare,
   LogOut,
   Menu,
   X,
   Home,
   Terminal,
   Shield,
-  Zap
+  Zap,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { CLUB_INFO } from '../../utils/constants';
@@ -33,6 +34,7 @@ const AdminLayout = () => {
     { name: 'Members', href: '/admin/members', icon: Users, color: 'text-purple-400' },
     { name: 'Sponsors', href: '/admin/sponsors', icon: Heart, color: 'text-pink-400' },
     { name: 'Contacts', href: '/admin/contacts', icon: MessageSquare, color: 'text-indigo-400' },
+    { name: 'Gallery', href: '/admin/gallery', icon: ImageIcon, color: 'text-teal-400' },
   ];
 
   const handleLogout = () => {
@@ -72,20 +74,19 @@ const AdminLayout = () => {
 
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-75 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 glass-effect border-r border-gray-700/50 transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 glass-effect border-r border-gray-700/50 transform transition-all duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div className="flex flex-col h-full relative">
           {/* Glow effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-600/20 to-purple-600/20 rounded-2xl blur opacity-30"></div>
-          
+
           <div className="relative bg-gray-900/90 backdrop-blur-xl h-full">
             {/* Logo */}
             <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
@@ -122,11 +123,10 @@ const AdminLayout = () => {
                     key={item.name}
                     to={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`group relative flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                      active
-                        ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 text-cyan-400 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent hover:border-gray-700/50'
-                    }`}
+                    className={`group relative flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${active
+                      ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 text-cyan-400 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent hover:border-gray-700/50'
+                      }`}
                   >
                     {active && (
                       <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 to-blue-600/30 rounded-lg blur opacity-50"></div>
@@ -164,7 +164,7 @@ const AdminLayout = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Link
                   to="/"
@@ -174,7 +174,7 @@ const AdminLayout = () => {
                   <span className="code-font">View Site</span>
                   <Zap size={12} className="ml-auto opacity-0 group-hover:opacity-100 text-green-400 transition-opacity" />
                 </Link>
-                
+
                 <button
                   onClick={handleLogout}
                   className="group w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent hover:border-red-500/30"
@@ -201,7 +201,7 @@ const AdminLayout = () => {
               >
                 <Menu size={20} />
               </button>
-              
+
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
                   <Terminal size={16} className="text-cyan-400" />
@@ -216,7 +216,7 @@ const AdminLayout = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-800/30 border border-gray-700/30">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -224,7 +224,7 @@ const AdminLayout = () => {
                   Welcome, <span className="text-cyan-400">{user?.name}</span>
                 </span>
               </div>
-              
+
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>

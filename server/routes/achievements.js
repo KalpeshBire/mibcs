@@ -40,10 +40,14 @@ router.get('/', async (req, res) => {
     if (domain) query.domains = domain;
     if (featured) query.featured = featured === 'true';
 
+    console.log('GET /api/achievements query:', query);
+
     const achievements = await Achievement.find(query)
       .sort({ date: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
+
+    console.log(`Found ${achievements.length} achievements`);
 
     const total = await Achievement.countDocuments(query);
 
@@ -83,9 +87,12 @@ router.get('/:id', async (req, res) => {
 // @route   POST /api/achievements
 // @desc    Create achievement
 // @access  Private (Admin)
+// @route   POST /api/achievements
+// @desc    Create achievement
+// @access  Private (Admin)
 router.post('/', [
   adminAuth,
-  upload.single('image'),
+  upload.array('images', 5), // Allow up to 5 images
   body('title').notEmpty().trim(),
   body('description').notEmpty(),
   body('category').isIn(['hackathon', 'competition', 'research', 'recognition', 'certification', 'other']),
@@ -95,19 +102,26 @@ router.post('/', [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      // Clean up uploaded files if validation fails
+      if (req.files) {
+        req.files.forEach(file => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+      }
       return res.status(400).json({ errors: errors.array() });
     }
 
     let images = [];
-    if (req.file) {
-      const uploadResult = await uploadToCloudinary(req.file.path);
-      if (uploadResult) {
-        images.push({
-          url: uploadResult.secure_url,
-          publicId: uploadResult.public_id,
-          caption: req.body.title
-        });
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await uploadToCloudinary(file.path);
+        if (uploadResult) {
+          images.push({
+            url: uploadResult.secure_url,
+            publicId: uploadResult.public_id,
+            caption: req.body.title
+          });
+        }
       }
     }
 
@@ -180,21 +194,27 @@ router.post('/', [
 // @route   PUT /api/achievements/:id
 // @desc    Update achievement
 // @access  Private (Admin)
-router.put('/:id', [adminAuth, upload.single('image')], async (req, res) => {
+router.put('/:id', [adminAuth, upload.array('images', 5)], async (req, res) => {
   try {
     let achievement = await Achievement.findById(req.params.id);
     if (!achievement) {
       return res.status(404).json({ message: 'Achievement not found' });
     }
 
-    if (req.file) {
-      const uploadResult = await uploadToCloudinary(req.file.path);
-      if (uploadResult) {
-        achievement.images = [{
-          url: uploadResult.secure_url,
-          publicId: uploadResult.public_id,
-          caption: req.body.title
-        }];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await uploadToCloudinary(file.path);
+        if (uploadResult) {
+          // Add to existing images instead of replacing them all, or replace? 
+          // Usually for a simple edit, maybe we replace all if new ones are uploaded, or append.
+          // User wants to see multiple images. Let's append for now or replace if it's a "reset".
+          // For simplicity in this iteration, let's Append new ones.
+          achievement.images.push({
+            url: uploadResult.secure_url,
+            publicId: uploadResult.public_id,
+            caption: req.body.title
+          });
+        }
       }
     }
 

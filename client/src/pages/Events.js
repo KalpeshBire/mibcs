@@ -30,10 +30,10 @@ const Events = () => {
   const events = data?.events || [];
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                         event.description.toLowerCase().includes(filters.search.toLowerCase());
+      event.description.toLowerCase().includes(filters.search.toLowerCase());
     const matchesLocation = !filters.location || event.location.includes(filters.location);
     const matchesSpeaker = !filters.speaker || event.speaker.toLowerCase().includes(filters.speaker.toLowerCase());
-    
+
     return matchesSearch && matchesLocation && matchesSpeaker;
   });
 
@@ -87,7 +87,7 @@ const Events = () => {
               Tech <span className="text-gradient">Events</span>
             </h1>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Join us for exciting workshops, hackathons, and seminars designed to enhance your technical skills 
+              Join us for exciting workshops, hackathons, and seminars designed to enhance your technical skills
               and connect with fellow innovators.
             </p>
           </motion.div>
@@ -106,18 +106,16 @@ const Events = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
-                      activeTab === tab.id
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
-                        : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-700/50'
-                    }`}
+                    className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${activeTab === tab.id
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-700/50'
+                      }`}
                   >
                     <Icon size={18} />
                     <span>{tab.name}</span>
                     {tab.count > 0 && (
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        activeTab === tab.id ? 'bg-white/20' : 'bg-gray-600'
-                      }`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${activeTab === tab.id ? 'bg-white/20' : 'bg-gray-600'
+                        }`}>
                         {tab.count}
                       </span>
                     )}
@@ -167,7 +165,7 @@ const Events = () => {
                 <option value="Blockchain">Blockchain</option>
                 <option value="Cyber Security">Cyber Security</option>
               </select>
-              <button 
+              <button
                 className="btn-outline flex items-center space-x-2"
                 onClick={() => setShowMoreFilters(!showMoreFilters)}
               >
@@ -461,7 +459,8 @@ const Events = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))}
+              ))
+              }
             </div>
           )}
 
@@ -479,10 +478,10 @@ const Events = () => {
             </motion.div>
           )}
         </div>
-      </section>
+      </section >
 
       {/* CTA Section */}
-      <section className="section-padding bg-gray-900/50">
+      < section className="section-padding bg-gray-900/50" >
         <div className="container-max text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -499,7 +498,7 @@ const Events = () => {
                   Want to <span className="text-gradient">Host</span> an Event?
                 </h2>
                 <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-                  Have an idea for a workshop, seminar, or hackathon? We'd love to help you organize 
+                  Have an idea for a workshop, seminar, or hackathon? We'd love to help you organize
                   and promote your event to our community of tech enthusiasts.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -514,8 +513,8 @@ const Events = () => {
             </div>
           </motion.div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 };
 

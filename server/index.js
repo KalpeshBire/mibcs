@@ -13,6 +13,7 @@ const memberRoutes = require('./routes/members');
 const sponsorRoutes = require('./routes/sponsors');
 const contactRoutes = require('./routes/contact');
 const analyticsRoutes = require('./routes/analytics');
+const galleryRoutes = require('./routes/gallery');
 
 const app = express();
 
@@ -30,6 +31,13 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Debug Middleware to log request headers and content-type
+app.use((req, res, next) => {
+  // console.log(`[${req.method}] ${req.url}`);
+  // console.log('Content-Type:', req.headers['content-type']);
+  next();
+});
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -43,6 +51,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/sponsors', sponsorRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

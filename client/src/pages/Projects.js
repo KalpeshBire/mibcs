@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { motion } from 'framer-motion';
-import { Search, Filter, Github, ExternalLink, Code, Cpu, Shield, Wifi, Database, Calendar, Users, ChevronDown } from 'lucide-react';
+import { Search, Filter, Github, ExternalLink, Code, Cpu, Shield, Wifi, Database, ChevronDown } from 'lucide-react';
 import { api } from '../utils/api';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 
@@ -40,15 +40,7 @@ const Projects = () => {
     return icons[domain] || Code;
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      'completed': 'bg-green-500/20 text-green-400 border-green-500/30',
-      'ongoing': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      'planning': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-      'paused': 'bg-gray-500/20 text-gray-400 border-gray-500/30'
-    };
-    return colors[status] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-  };
+
 
   return (
     <div className="page-container bg-gray-950">
@@ -188,118 +180,84 @@ const Projects = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="card-glow group hover:scale-105 transition-all duration-300"
+                  className="group relative h-full flex"
                 >
-                  <div className="space-y-6">
-                    {/* Image */}
-                    {project.images && project.images.length > 0 && (
-                      <div className="relative h-48 rounded-lg overflow-hidden">
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
+
+                  <div className="relative w-full bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-700/50 overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col">
+
+                    {/* Project Image */}
+                    <div className="relative h-64 bg-gray-800 shrink-0 overflow-hidden">
+                      {project.images && project.images.length > 0 ? (
                         <img
                           src={project.images[0].url}
                           alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-800 text-gray-600">
+                          <Code size={48} />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent"></div>
 
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <h3 className="text-xl font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                      {/* Status Badge */}
+                      <div className="absolute top-4 right-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg ${project.status === 'completed' ? 'bg-green-500 text-white' :
+                          project.status === 'ongoing' ? 'bg-blue-500 text-white' :
+                            project.status === 'planning' ? 'bg-yellow-500 text-black' :
+                              'bg-gray-700 text-gray-300'
+                          }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1">
                         {project.title}
                       </h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
-                        {project.status}
-                      </span>
-                    </div>
 
-                    {/* Description */}
-                    <p className="text-gray-400 leading-relaxed">
-                      {project.shortDescription || project.description}
-                    </p>
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">
+                        {project.shortDescription || project.description}
+                      </p>
 
-                    {/* Domains */}
-                    {project.domains && project.domains.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {project.domains.map((domain) => {
-                          const Icon = getDomainIcon(domain);
-                          return (
-                            <span
-                              key={domain}
-                              className="flex items-center space-x-1 px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30"
-                            >
-                              <Icon size={12} />
-                              <span>{domain}</span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Tech Stack */}
-                    {project.techStack && project.techStack.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {project.techStack.slice(0, 4).map((tech, techIndex) => (
-                          <span
-                            key={techIndex}
-                            className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded border border-gray-700"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                        {project.techStack.length > 4 && (
-                          <span className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded border border-gray-700">
-                            +{project.techStack.length - 4} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Project Info */}
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
-                        {project.teamSize && (
-                          <div className="flex items-center space-x-1">
-                            <Users size={14} />
-                            <span>{project.teamSize} members</span>
-                          </div>
-                        )}
-                        {project.startDate && (
-                          <div className="flex items-center space-x-1">
-                            <Calendar size={14} />
-                            <span>{new Date(project.startDate).getFullYear()}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center space-x-3 pt-4 border-t border-gray-800">
-                      {project.githubUrl && (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
-                        >
-                          <Github size={16} />
-                          <span className="text-sm">Code</span>
-                        </a>
+                      {/* Domain Badges */}
+                      {project.domains && project.domains.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {project.domains.slice(0, 3).map((domain) => {
+                            const Icon = getDomainIcon(domain);
+                            return (
+                              <span key={domain} className="px-2 py-1 bg-gray-800 text-cyan-400 text-xs rounded border border-gray-700 flex items-center">
+                                <Icon size={10} className="mr-1" />
+                                {domain}
+                              </span>
+                            );
+                          })}
+                        </div>
                       )}
-                      {project.demoUrl && (
-                        <a
-                          href={project.demoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
-                        >
-                          <ExternalLink size={16} />
-                          <span className="text-sm">Demo</span>
-                        </a>
-                      )}
-                      <button className="flex items-center space-x-2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 ml-auto">
-                        <span className="text-sm">Learn More</span>
-                      </button>
+
+                      <div className="pt-4 border-t border-gray-800 mt-auto">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <a href={project.githubUrl || '#'} target={project.githubUrl ? "_blank" : "_self"} rel="noopener noreferrer"
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors group/icon"
+                              title={project.githubUrl ? "View Code" : "Code Coming Soon"}>
+                              <Github size={18} className="text-gray-400 group-hover/icon:text-white" />
+                            </a>
+                            <a href={project.demoUrl || '#'} target={project.demoUrl ? "_blank" : "_self"} rel="noopener noreferrer"
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors group/icon"
+                              title={project.demoUrl ? "Live Demo" : "Demo Coming Soon"}>
+                              <ExternalLink size={18} className="text-cyan-400 group-hover/icon:text-white" />
+                            </a>
+                          </div>
+
+                          <button className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300">
+                            View Details
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
