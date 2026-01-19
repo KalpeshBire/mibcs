@@ -207,7 +207,7 @@ const seedData = async () => {
         name: 'John Doe',
         email: 'john.doe@university.edu',
         role: 'President',
-        team: 'Core',
+        team: 'Core Committee',
         domains: ['ML', 'Blockchain'],
         bio: 'Passionate about AI and blockchain technology. Leading MIBCS towards innovation and excellence.',
         social: {
@@ -222,7 +222,7 @@ const seedData = async () => {
         name: 'Jane Smith',
         email: 'jane.smith@university.edu',
         role: 'Vice President',
-        team: 'Core',
+        team: 'Core Committee',
         domains: ['IoT', 'Cybersecurity'],
         bio: 'Expert in IoT security and embedded systems. Organizing workshops and technical events.',
         social: {
@@ -237,7 +237,7 @@ const seedData = async () => {
         name: 'Alice Johnson',
         email: 'alice.johnson@university.edu',
         role: 'Technical Lead - ML',
-        team: 'Technical',
+        team: 'Senior Committee',
         domains: ['ML'],
         bio: 'Machine learning enthusiast with experience in computer vision and NLP projects.',
         social: {
@@ -252,7 +252,7 @@ const seedData = async () => {
         name: 'Bob Wilson',
         email: 'bob.wilson@university.edu',
         role: 'Technical Lead - Blockchain',
-        team: 'Technical',
+        team: 'Senior Committee',
         domains: ['Blockchain'],
         bio: 'Blockchain developer working on DeFi and smart contract security.',
         social: {
