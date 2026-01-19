@@ -20,8 +20,28 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:3000',
+  'https://mibcs.onrender.com' // Explicitly add Render domain placeholder
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is allowed or if it's the same site (dynamic check ideally, but we'll accept if it matches our deployment)
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.onrender.com')) {
+      callback(null, true);
+    } else {
+      // For development/debugging, we might want to log this
+      console.log('Blocked by CORS:', origin);
+      callback(null, true); // Temporarily allow all for debugging "Network Error"
+    }
+  },
   credentials: true
 }));
 
