@@ -5,9 +5,25 @@ const { adminAuth } = require('../middleware/auth');
 const multer = require('multer');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const fs = require('fs');
+const path = require('path');
 
 // Configure Multer for file upload
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (!fs.existsSync('uploads')) {
+      fs.mkdirSync('uploads');
+    }
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
+  }
+});
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 // @route   GET /api/gallery
 // @desc    Get all gallery images
@@ -37,13 +53,17 @@ router.post('/', [adminAuth, upload.single('image')], async (req, res) => {
             return res.status(500).json({ message: 'Error uploading image to Cloudinary' });
         }
 
+        // Sanitize inputs
+        const title = req.body.title && req.body.title !== '' ? req.body.title : undefined;
+        const category = req.body.category && req.body.category !== '' ? req.body.category : 'general';
+
         const newImage = new Gallery({
-            title: req.body.title,
+            title,
             image: {
-                url: uploadResult.secure_url,
+                url: uploadResult.secure_url, // Ensures HTTPS
                 publicId: uploadResult.public_id
             },
-            category: req.body.category
+            category
         });
 
         const savedImage = await newImage.save();
@@ -66,9 +86,6 @@ router.delete('/:id', adminAuth, async (req, res) => {
         if (!image) {
             return res.status(404).json({ message: 'Image not found' });
         }
-
-        // Optional: Delete from Cloudinary (requires additional utils if expected)
-        // For now we just remove from DB as per typical flow unless strict clean up is required.
 
         await image.deleteOne();
         res.json({ message: 'Image removed' });
