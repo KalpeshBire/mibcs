@@ -17,6 +17,25 @@ const FeaturedProjects = () => {
         }
     );
 
+    const handleViewProject = (project) => {
+        // Priority: demo/website → github → documentation → other links
+        let targetUrl = null;
+        
+        if (project.links?.demo) {
+            targetUrl = project.links.demo;
+        } else if (project.links?.github) {
+            targetUrl = project.links.github;
+        } else if (project.links?.documentation) {
+            targetUrl = project.links.documentation;
+        } else if (project.links?.other && project.links.other.length > 0) {
+            targetUrl = project.links.other[0];
+        }
+        
+        if (targetUrl) {
+            window.open(targetUrl, '_blank');
+        }
+    };
+
     const featuredProjects = data?.projects || [];
     const itemsPerPage = 3;
 
@@ -204,8 +223,8 @@ const FeaturedProjects = () => {
                                                     ))}
                                                 </div>
 
-                                                <Link
-                                                    to={`/projects`}
+                                                <button
+                                                    onClick={() => handleViewProject(project)}
                                                     className="w-full py-3 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border border-cyan-500 rounded-lg text-cyan-400 hover:bg-cyan-500/30 transition-all duration-300 group/btn relative overflow-hidden"
                                                 >
                                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
@@ -213,7 +232,7 @@ const FeaturedProjects = () => {
                                                         <span className="font-medium">./view_project.sh</span>
                                                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                                                     </div>
-                                                </Link>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
